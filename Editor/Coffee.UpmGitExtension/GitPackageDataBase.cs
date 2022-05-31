@@ -56,11 +56,13 @@ namespace Coffee.UpmGitExtension
 
         public static void Install(string packageId)
         {
+            Debug.Log("Install");
             _upmClient.AddByUrl(packageId);
         }
 
         public static void Uninstall(string packageId)
         {
+            Debug.Log("Uninstall");
             var i = packageId.IndexOf('@');
             var packageName = packageId.Substring(0, i);
             _upmClient.RemoveByName(packageName);
@@ -68,17 +70,20 @@ namespace Coffee.UpmGitExtension
 
         public static IEnumerable<UpmPackage> GetUpmPackages()
         {
+            Debug.Log("GetUpmPackages");
             return _packageDatabase.allPackages.OfType<UpmPackage>();
         }
 
         public static IEnumerable<UpmPackage> GetInstalledGitPackages()
         {
+            Debug.Log("GetInstalledGitPackages");
             return GetUpmPackages()
                 .Where(p => p.GetInstalledVersion()?.HasTag(PackageTag.Git) == true);
         }
 
         public static string[] GetCachedRepositoryUrls()
         {
+            Debug.Log("GetCachedRepositoryUrls");
             return _resultCaches.Select(x => x.url).ToArray();
         }
 
@@ -87,6 +92,7 @@ namespace Coffee.UpmGitExtension
         /// </summary>
         public static void Fetch(string url, Action<int> callback = null)
         {
+            Debug.Log("Fetch" + url);
             const string kFetchPackagesJs = "Packages/com.coffee.upm-git-extension/Editor/Commands/fetch-packages.js";
 #if UNITY_EDITOR_WIN
             var node = Path.Combine(EditorApplication.applicationContentsPath, "Tools/nodejs/node.exe").Replace('/', '\\');
@@ -110,16 +116,19 @@ namespace Coffee.UpmGitExtension
 
         internal static IPackage GetPackage(IPackageVersion packageVersion)
         {
+            Debug.Log("Install");
             return _packageDatabase.GetPackage(packageVersion);
         }
 
         internal static IPackage GetPackage(string packageName)
         {
+            Debug.Log("Install");
             return _packageDatabase.GetPackage(packageName);
         }
 
         internal static IPackageVersion GetPackageVersion(string packageUniqueId, string versionUniqueId)
         {
+            Debug.Log("Install");
             IPackage package;
             IPackageVersion version;
             _packageDatabase.GetPackageAndVersion(packageUniqueId, versionUniqueId, out package, out version);
@@ -131,6 +140,7 @@ namespace Coffee.UpmGitExtension
         /// </summary>
         public static void Fetch()
         {
+            Debug.Log("Fetch");
             GetInstalledGitPackages()
                 .Select(p => p?.versions?.primary?.packageInfo?.GetSourceUrl())
                 .Where(url => !string.IsNullOrEmpty(url))
@@ -141,12 +151,14 @@ namespace Coffee.UpmGitExtension
 
         public static void OpenCacheDirectory()
         {
+            Debug.Log("OpenCacheDirectory");
             if (Directory.Exists(_workingDirectory))
                 EditorUtility.RevealInFinder(_workingDirectory);
         }
 
         public static void ClearCache()
         {
+            Debug.Log("ClearCache");
             _resultCaches.Clear();
 
             if (Directory.Exists(_workingDirectory))
@@ -158,6 +170,7 @@ namespace Coffee.UpmGitExtension
 
         public static IEnumerable<UpmPackageVersionEx> GetAvailablePackageVersions(string packageId = null, string repoUrl = null, bool preRelease = false)
         {
+            Debug.Log("GetAvailablePackageVersions " + packageId + repoUrl);
             return _resultCaches
                 .SelectMany(r => r.versions)
                 .Where(v => v.isValid && (preRelease || _enablePreReleasePackages || !v.IsPreRelease())
